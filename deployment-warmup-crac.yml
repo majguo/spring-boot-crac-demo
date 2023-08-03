@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-warmup-crac-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spring-boot-warmup-crac-demo
+  template:
+    metadata:
+      labels:
+        app: spring-boot-warmup-crac-demo
+    spec:
+      containers:
+      - name: spring-boot-warmup-crac-demo
+        image: ghcr.io/majguo/spring-boot-warmup-crac-demo:checkpoint
+        imagePullPolicy: Always
+        securityContext:
+          privileged: false
+          capabilities:
+            add:
+            - CHECKPOINT_RESTORE
+            drop:
+            - ALL

@@ -1,0 +1,50 @@
+
+name: Benchmark
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: 
+      packages: write
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: 17
+        distribution: 'zulu'
+    - uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: Generate CRaC and non-CRaC images
+      run: |
+        ./checkpoint.sh
+
+    - name: Benchmark test
+      run: |
+        ./benchmark.sh
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push images to GitHub Container Registry
+      run: |
+        docker tag spring-boot-demo ghcr.io/${{ github.repository_owner }}/spring-boot-demo
+        docker tag spring-boot-startup-crac-demo:checkpoint ghcr.io/${{ github.repository_owner }}/spring-boot-startup-crac-demo:checkpoint
+        docker tag spring-boot-warmup-crac-demo:checkpoint ghcr.io/${{ github.repository_owner }}/spring-boot-warmup-crac-demo:checkpoint
+        docker push ghcr.io/${{ github.repository_owner }}/spring-boot-demo
+        docker push ghcr.io/${{ github.repository_owner }}/spring-boot-startup-crac-demo:checkpoint
+        docker push ghcr.io/${{ github.repository_owner }}/spring-boot-warmup-crac-demo:checkpoint

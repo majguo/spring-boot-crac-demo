@@ -1,11 +1,11 @@
 apiVersion: carto.run/v1alpha1
 kind: Workload
 metadata:
-  name: spring-boot-crac-demo
+  name: spring-boot-warmup-crac-demo
   labels:
     apps.tanzu.vmware.com/workload-type: web
-    app.kubernetes.io/part-of: spring-boot-crac-demo
+    app.kubernetes.io/part-of: spring-boot-warmup-crac-demo
   annotations:
     autoscaling.knative.dev/min-scale: "0"
 spec:
-  image: sdeleuze/spring-boot-crac-demo:checkpoint
+  image: ghcr.io/majguo/spring-boot-warmup-crac-demo:checkpoint

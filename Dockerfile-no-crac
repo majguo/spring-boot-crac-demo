@@ -1,0 +1,13 @@
+FROM ubuntu:23.04
+
+ARG JDK_URL
+
+ENV JAVA_HOME /opt/jdk
+ENV PATH $JAVA_HOME/bin:$PATH
+
+ADD $JDK_URL $JAVA_HOME/openjdk.tar.gz
+RUN tar --extract --file $JAVA_HOME/openjdk.tar.gz --directory "$JAVA_HOME" --strip-components 1; rm $JAVA_HOME/openjdk.tar.gz;
+RUN mkdir -p /opt/app
+COPY target/spring-boot-demo-1.0.0-SNAPSHOT.jar /opt/app/spring-boot-demo-1.0.0-SNAPSHOT.jar
+
+CMD ["java", "-Dmanagement.endpoint.health.probes.add-additional-paths=\"true\"", "-Dmanagement.health.probes.enabled=\"true\"", "-jar", "/opt/app/spring-boot-demo-1.0.0-SNAPSHOT.jar"]
